@@ -12,14 +12,19 @@
      * @returns {Object}
      * @constructor
      */
-    function ZenService($http, $q) {
-
+    function ZenService($http, $q, $scope) {
+        var pathWords = '/components/zen/words/';
         var words = [];
-
+        
+        /**
+         * @TODO use constanst for types
+         */
+        
         _initialize();
 
         return {
-            'getPhrase': getPhrase
+            words: words,
+            getPhrase: getPhrase
         };
 
         /**
@@ -27,6 +32,26 @@
          * @private
          */
         function _initialize() {
+            var promises = [];
+            var types = [
+                'adj',
+                'article',
+                'conjs',
+                'nouns',
+                'preps',
+                'subj',
+                'verbs'
+            ];
+
+            angular.forEach(types, function (type) {
+                var promise = ftowl(type).then(function (response) {
+                    var name = response.name;
+                    words[name] = response.data;
+                });
+                promises.push(promise);
+            });
+
+            return $q.all(promises);
         }
 
         /**
@@ -75,30 +100,15 @@
         /**
          * 
          * @param string filename
-         * @returns {unresolved}
+         * @returns promise
          */
         function ftowl(filename) {
-            var deferred = $q.defer();
-            var newWords = undefined;
-
-//            $http.get({
-//                method: "GET",
-//                async: false,
-//                url: "/components/zen/words/" + filename + '.txt'
-//            }).then(function success(response) {
-            $http.get("/components/zen/words/" + filename + '.txt')
-                    .then(function(result) {
-                        newWords = result.data;
-                        console.log(newWords);
-                        deferred.resolve(newWords);
-                    }, function(error) {
-                        console.log(error);
-                        newWords = error;
-                        deferred.reject(error);
+            return $http.get(pathWords + filename + '.txt')
+                    .then(function (result) {
+                        return {'name': filename, 'data': result.data.trim().split('\n')};
+                    }, function (error) {
+                        return {'error': error}
                     });
-
-
-            return $q.when(newWords);
         }
 
         /**
@@ -129,21 +139,7 @@
                 "CONJ": words.conjsl,
                 "END": [""],
             };
-
-            // daten ermitteln wenn noch nicht geladen
-            if (typeof data[part] === 'undefined') {
-                ftowl(part.toLowerCase()).then(function (newWords) {
-                    console.log(newWords);
-                });
-//                ftowl(part.toLowerCase()).then(function (data) {
-//                    words[part.toLowerCase()] = data.trim().split('\n');
-//                    console.log(choice(words[part.toLowerCase()]));
-//                    return choice(words[part.toLowerCase()]);
-//                });
-                console.log('**');
-            } else {
-                return choice(data[part]);
-            }
+            return choice(data[part]);
         }
 
         /**
