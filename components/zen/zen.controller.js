@@ -13,8 +13,9 @@
     ZenController.$inject = ['$scope', 'ZenService'];
 
     function ZenController($scope, ZenService) {
-        console.log('***');
-        console.log(ZenService.getPhrase());
+//        $scope.getPhrase = ZenService.getPhrase;
+        console.log(ZenService.getPhrase(10));
+//        console.log($scope.getPhrase());
     }
 
 })(window.angular);
