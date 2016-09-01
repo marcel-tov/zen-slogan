@@ -5,16 +5,14 @@
             .module('myApp.zen')
             .factory('ZenService', ZenService);
 
-    ZenService.$inject = ['$http'];
+    ZenService.$inject = ['$http', '$q'];
 
     /**
-     * A Service that can be used to retrieve available creatives.
      *
      * @returns {Object}
-     *
      * @constructor
      */
-    function ZenService($http) {
+    function ZenService($http, $q) {
 
         var words = [];
 
@@ -25,20 +23,10 @@
         };
 
         /**
-         * Initially constructs an array out of creatives that would normally be loaded from an API.
          *
          * @private
          */
         function _initialize() {
-            words = {
-                'nounsl': ftowl("nouns.txt"),
-                'adjsl': ftowl("adjs.txt"),
-                'verbsl': ftowl("verbs.txt"),
-                'articlesl': ftowl("articles.txt"),
-                'prepsl': ftowl("preps.txt"),
-                'conjsl': ftowl("conjs.txt")
-            };
-            console.log(words);
         }
 
         /**
@@ -48,13 +36,12 @@
          */
         function getPhrase(limit) {
             var ret = [];
-
             var part = "ARTICLE";
             var phrase = "";
             var ccount = 0; // counts conjunctions
             var subj = true; // 1 if subject, 2 if object is next
 
-            var lim = 10;
+            var lim = 0;
             while (true) {
                 if (part == "CONJ") {
                     ccount++;
@@ -62,24 +49,27 @@
                         return formatPhrase(phrase)
                     }
                 }
-                phrase += getRandomWord(part);
+                phrase += ' ' + getRandomWord(part);
                 var ret = getNextPart(part, subj);
-
-                console.log(ret);
+                if (ret) {
+                    part = ret[0];
+                    subj = ret[1];
+                }
 
                 if (part == "END") {
                     //# fix 'a' vs 'an'
                     return formatPhrase(phrase);
                 }
 
-                console.log('ccount: ' + ccount);
-                console.log(phrase);
-
+                // nicht mehr als 200 wörter!!!
                 lim++;
-                if (lim > 10) {
+                if (lim > 1) {
+                    console.log('endless loop?!');
                     break;
                 }
             }
+
+            console.log(phrase);
         }
 
         /**
@@ -88,43 +78,48 @@
          * @returns {unresolved}
          */
         function ftowl(filename) {
-            return ['Leben', 'test', 'aaa'];
+            var deferred = $q.defer();
+            var newWords = undefined;
 
-            return $http({
-                method: "GET",
-                async: false,
-                url: "/components/zen/words/" + filename
-            }).then(function success(response) {
-                return response.data;
-            }, function error(response) {
-                console.log('Fehler:' + response.statusText + ' ' + response.status);
-            });
+//            $http.get({
+//                method: "GET",
+//                async: false,
+//                url: "/components/zen/words/" + filename + '.txt'
+//            }).then(function success(response) {
+            $http.get("/components/zen/words/" + filename + '.txt')
+                    .then(function(result) {
+                        newWords = result.data;
+                        console.log(newWords);
+                        deferred.resolve(newWords);
+                    }, function(error) {
+                        console.log(error);
+                        newWords = error;
+                        deferred.reject(error);
+                    });
+
+
+            return $q.when(newWords);
         }
 
-//                var promise = $scope.ftowl("nouns.txt");
-//                promise.then(function(result) {
-//                    console.log(result); // "Stuff worked!"
-//                  }, function(err) {
-//                    console.log(err); // Error: "It broke"
-//                  });
-//                
-
         /**
+         * Random word in array
          * 
-         * @param {type} a
+         * @param array words
          * @returns {zen_service_L1.ZenService.choice.a}
          */
-        function choice(a) {
-            return a[0]; // return random
+        function choice(words) {
+            var key = Math.floor(Math.random() * words.length);
+            return words[key]; // return random
         }
 
         /**
+         * find the next Word by random
          * 
          * @param {type} part
          * @returns {zen_service_L1.ZenService.choice.a}
          */
         function getRandomWord(part) {
-            return choice({
+            var data = {
                 "SUBJ": words.nounsl,
                 "OBJ": words.nounsl,
                 "ADJ": words.adjsl,
@@ -133,10 +128,26 @@
                 "PREP": words.prepsl,
                 "CONJ": words.conjsl,
                 "END": [""],
-            }[part]);
+            };
+
+            // daten ermitteln wenn noch nicht geladen
+            if (typeof data[part] === 'undefined') {
+                ftowl(part.toLowerCase()).then(function (newWords) {
+                    console.log(newWords);
+                });
+//                ftowl(part.toLowerCase()).then(function (data) {
+//                    words[part.toLowerCase()] = data.trim().split('\n');
+//                    console.log(choice(words[part.toLowerCase()]));
+//                    return choice(words[part.toLowerCase()]);
+//                });
+                console.log('**');
+            } else {
+                return choice(data[part]);
+            }
         }
 
         /**
+         * Ermittelt das nächste Wort welches auf das vorherige folgen soll
          * 
          * @param string part
          * @param boolean subj
@@ -144,21 +155,36 @@
          */
         function getNextPart(part, subj) {
             //# markov thing to map parts of speech together
+            // Was soll als nächstes folgen?!
+            // Die Summe der Gewichtungen muss zusammen 1 ergeben.
             var l = {
                 "SUBJ": [["VERB", 1.0]],
-                "OBJ": [["PREP", 0.6], ["CONJ", 0.3], ["END", 0.1]],
-                "ADJ": [["ADJ", 0.3], ["SUBJ", 0.7 * subj], ["OBJ", 0.7 * !subj]],
-                "VERB": [["PREP", 0.5], ["ARTICLE", 0.5]],
-                "ARTICLE": [["ADJ", 0.6], ["SUBJ", 0.4 * subj], ["OBJ", 0.4 * !subj]],
+                "OBJ": [
+                    ["PREP", 0.6],
+                    ["CONJ", 0.3],
+                    ["END", 0.1]
+                ],
+                "ADJ": [
+                    ["ADJ", 0.3],
+                    ["SUBJ", 0.7 * subj],
+                    ["OBJ", 0.7 * !subj]
+                ],
+                "VERB": [
+                    ["PREP", 0.5],
+                    ["ARTICLE", 0.5]
+                ],
+                "ARTICLE": [
+                    ["ADJ", 0.6],
+                    ["SUBJ", 0.4 * subj],
+                    ["OBJ", 0.4 * !subj]
+                ],
                 "PREP": [["ARTICLE", 1.0]],
                 "CONJ": [["ARTICLE", 1.0]],
             }[part];
-            
-            console.log(l);
 
-            var c = (Math.random() * (1 - 0) + 0).toFixed(1);
-            var e = 'None';
-            
+            var c = (Math.random() * (1 - 0.2) + 0.1).toFixed(1); // Der Wert darf nie direkt 1 sein!
+            var e = [["None", 1.0]];
+
             while (c > 0.0) {
                 e = l.pop();
                 c -= e[1];
