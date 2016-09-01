@@ -13,9 +13,10 @@
     ZenController.$inject = ['$scope', 'ZenService'];
 
     function ZenController($scope, ZenService) {
-//        $scope.getPhrase = ZenService.getPhrase;
-        console.log(ZenService.getPhrase(10));
-//        console.log($scope.getPhrase());
+        $scope.words = ZenService.words;
+        console.log($scope.words);
+        console.log($scope.words['adj']);
+        $scope.phrase = ZenService.getPhrase(10);
     }
 
 })(window.angular);

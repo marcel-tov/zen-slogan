@@ -1,2 +1,4 @@
-a
-the
+ein
+das
+der
+die
