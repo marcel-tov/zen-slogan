@@ -12,11 +12,25 @@
 
     ZenController.$inject = ['$scope', 'ZenService'];
 
+    /**
+     * 
+     * @param {type} $scope
+     * @param {type} ZenService
+     * @returns {undefined}
+     */
     function ZenController($scope, ZenService) {
-        $scope.words = ZenService.words;
-        console.log($scope.words);
-        console.log($scope.words['adj']);
-        $scope.phrase = ZenService.getPhrase(10);
+
+        /**
+         * 
+         * @TODO load words only once
+         */
+        $scope.loadPhrase = function () {
+            ZenService.getWords().then(function (response) {
+                $scope.words = ZenService.words;
+                console.log($scope.words);
+                $scope.phrase = ZenService.getPhrase(10);
+            });
+        };
     }
 
 })(window.angular);
