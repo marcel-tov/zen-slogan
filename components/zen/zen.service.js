@@ -69,12 +69,16 @@
         function getWords() {
             var promises = [];
             var types = [
-                'adj',
+                'adjective',
                 'article',
                 'conjs',
                 'nouns',
-                'preps',
-                'subj',
+                /**
+                 * Präpositionen sind kleine Wörter (an, in, zu),
+                 * die normalerweise vor einem Nomen stehen (manchmal auch vor einem Verb im Gerundium).
+                 */
+                'preposition', 
+                'subjective',
                 'verbs'
             ];
 
@@ -88,7 +92,7 @@
 
             return $q.all(promises);
         }
-        
+
         /**
          * 
          * @param string word
@@ -128,7 +132,7 @@
                         return formatPhrase(phrase)
                     }
                 }
-                
+
                 nextWord = getRandomWord(part);
                 phrase += toWord(nextWord, lastWord, part);
                 lastWord = nextWord;
@@ -148,8 +152,9 @@
                  * remove this case
                  */
                 lim++;
-                if (lim > 200) {
+                if (lim > 100) {
                     console.log('endless loop?!');
+                    return formatPhrase(phrase);
                     break;
                 }
             }
@@ -190,12 +195,12 @@
          */
         function getRandomWord(part) {
             var data = {
-                "SUBJ": words.nouns,
+                "SUBJECTIVE": words.nouns,
                 "OBJ": words.nouns,
-                "ADJ": words.adj,
+                "ADJECTIVE": words.adjective,
                 "VERB": words.verbs,
                 "ARTICLE": words.article,
-                "PREP": words.preps,
+                "PREPOSITION": words.preposition,
                 "CONJ": words.conjs,
                 "END": [""],
             };
@@ -214,34 +219,40 @@
             // Was soll als nächstes folgen?!
             // Die Summe der Gewichtungen muss zusammen 1 ergeben.
             var l = {
-                "SUBJ": [["VERB", 1.0]],
+                "SUBJECTIVE": [["VERB", 1.0]],
                 "OBJ": [
-                    ["PREP", 0.6],
+                    ["PREPOSITION", 0.3],
                     ["CONJ", 0.3],
                     ["END", 0.1]
                 ],
-                "ADJ": [
-                    ["ADJ", 0.3],
-                    ["SUBJ", 0.7 * subj],
+                "ADJECTIVE": [
+                    ["ADJECTIVE", 0.3],
+                    ["SUBJECTIVE", 0.7 * subj],
                     ["OBJ", 0.7 * !subj]
                 ],
                 "VERB": [
-                    ["PREP", 0.5],
+                    ["PREPOSITION", 0.5],
                     ["ARTICLE", 0.5]
                 ],
                 "ARTICLE": [
-                    ["ADJ", 0.6],
-                    ["SUBJ", 0.4 * subj],
+                    ["ADJECTIVE", 0.6],
+                    ["SUBJECTIVE", 0.4 * subj],
                     ["OBJ", 0.4 * !subj]
                 ],
-                "PREP": [["ARTICLE", 1.0]],
+                "PREPOSITION": [["ARTICLE", 1.0]],
                 "CONJ": [["ARTICLE", 1.0]],
             }[part];
 
-            var c = (Math.random() * (1 - 0.2) + 0.1).toFixed(1); // Der Wert darf nie direkt 1 sein!
+            // Der Wert darf nie direkt 1 sein!
+            var c = (Math.random() * (1 - 0.2) + 0.1).toFixed(1);
+//            var c = 0.13;
+            console.log(c);
             var e = [["None", 1.0]];
 
             while (c > 0.0) {
+                if (l.length < 1) {
+                    break;
+                }
                 e = l.pop();
                 c -= e[1];
             }
@@ -254,12 +265,13 @@
         }
 
         /**
+         * First letter to uppercase + point at the end.
          * 
          * @param string phrase
          * @returns string
          */
         function formatPhrase(phrase) {
-            return phrase + '.';
+            return phrase.charAt(1).toUpperCase() + phrase.slice(2) + '.';
         }
     }
 
