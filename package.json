@@ -1,9 +1,9 @@
 {
-  "name": "angular-seed",
+  "name": "zen-slogan",
   "private": true,
   "version": "0.0.0",
-  "description": "A starter project for AngularJS",
-  "repository": "https://github.com/angular/angular-seed",
+  "description": "Zen slogan phrase generator",
+  "repository": "https://github.com/marcel-tov/zen-slogan",
   "license": "MIT",
   "devDependencies": {
     "bower": "^1.7.7",
