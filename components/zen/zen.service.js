@@ -13,7 +13,7 @@
      * @constructor
      */
     function ZenService($http, $q, $scope) {
-        var pathWords = '/components/zen/words/';
+        var pathWords = 'components/zen/words/';
         var words = [];
 
 //        var tenses = {
