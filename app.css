@@ -4,7 +4,7 @@ button.reload {
 .phrase {
     font-family: 'Playfair Display';
     margin-top: 20px;
-    font-size: 20px;
+    font-size: 30px;
 }
 .phrase:empty {
     display: none;

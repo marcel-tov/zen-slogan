@@ -19,7 +19,6 @@
      * @returns {undefined}
      */
     function ZenController($scope, ZenService) {
-
         /**
          * 
          * @TODO load words only once
