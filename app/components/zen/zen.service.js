@@ -8,6 +8,7 @@
             .constant("ZC", {
                 // pfad wo sich die Dateien befinden
                 "PATH_WORDS": "components/zen/words/",
+                "END_PHRASE_MAX_WORDS": 10,
                 "PART": {
                     "SUBJECTIVE": 1,
                     "OBJ": 2,
@@ -46,6 +47,13 @@
      *
      * @returns {Object}
      * @constructor
+     */
+    /**
+     * 
+     * @param object $http
+     * @param object $q
+     * @param object ZC Config object
+     * @returns {zen_service_L1.ZenService.zen.serviceAnonym$2|zen_service_L1.ZenService.choice.words}
      */
     function ZenService($http, $q, ZC) {
         /*
@@ -149,8 +157,8 @@
             var nextWord, lastWord;
             var ccount = 0; // counts conjunctions
             var subj = true; // 1 if subject, 2 if object is next
-
-            var lim = 0;
+            var countWords = 0;
+            
             while (true) {
                 if (part == ZC.PART.CONJ) {
                     ccount++;
@@ -158,11 +166,11 @@
                         return formatPhrase(phrase)
                     }
                 }
-
+                
                 nextWord = getRandomWord(part);
                 phrase += toWord(nextWord, lastWord, part);
                 lastWord = nextWord;
-                var ret = getNextPart(part, subj);
+                var ret = getNextPart(part, subj, countWords);
                 if (ret) {
                     part = ret[0];
                     subj = ret[1];
@@ -171,17 +179,17 @@
                 if (part == ZC.PART.END) {
                     return formatPhrase(phrase);
                 }
-
-                /**
-                 * TODO 
-                 * remove this case
-                 */
-                lim++;
-                if (lim > 100) {
-                    console.log('endless loop?!');
-                    return formatPhrase(phrase);
-                    break;
-                }
+//
+//                /**
+//                 * TODO 
+//                 * remove this case
+//                 */
+                countWords++;
+//                if (countWords > 100) {
+//                    console.log('endless loop?!');
+//                    return formatPhrase(phrase);
+//                    break;
+//                }
             }
 
             console.log(phrase);
@@ -237,9 +245,10 @@
          * 
          * @param string part
          * @param boolean subj
+         * @param int countWords
          * @returns {Array}
          */
-        function getNextPart(part, subj) {
+        function getNextPart(part, subj, countWords) {
             // PARTS
             var p = ZC.PART;
             
@@ -286,14 +295,21 @@
             var c = (Math.random() * (1 - 0.2) + 0.1).toFixed(1);
 //            var c = 0.13;
             var e = [[p.NONE, 1.0]];
-
-            while (c > 0.0) {
-                if (l.length < 1) {
-                    break;
-                }
-                e = l.pop();
+            
+            // Satzlaenge begrenzen
+            if (countWords > ZC.END_PHRASE_MAX_WORDS && part == p.OBJ) {
+                e = l[2];
                 c -= e[1];
+            } else {
+                while (c > 0.0) {
+                    if (l.length < 1) {
+                        break;
+                    }
+                    e = l.pop();
+                    c -= e[1];
+                }
             }
+            
 
             if (e[0] == ZC.PART.VERB || e[0] == ZC.PART.CONJ) {
                 subj = !subj;
