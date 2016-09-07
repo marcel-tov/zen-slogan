@@ -22,6 +22,7 @@
                             $scope.words = ZenService.words;
                             console.log($scope.words);
                             $scope.phrase = ZenService.getPhrase(10);
+                            console.log($scope.phrase);
                         });
                     };
                 }]);
