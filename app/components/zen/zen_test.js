@@ -1,16 +1,26 @@
 'use strict';
 
-describe('myApp.view1 module', function() {
+describe('Testing Routes', function () {
+// load the controller's module
+    beforeEach(module('myApp'));
+    it('should test routes',
+            inject(function ($route) {
+                expect($route.routes['/zen'].controller).toBe('ZenController');
+                expect($route.routes['/zen'].templateUrl).toEqual('components/zen/zen.html');
+            }));
 
-  beforeEach(module('myApp.view1'));
+});
 
-  describe('view1 controller', function(){
+describe('myApp.zen module', function () {
+    beforeEach(module('myApp.zen'));
+    describe('zen controller', function () {
+        var location, route, rootScope;
 
-    it('should ....', inject(function($controller) {
-      //spec body
-      var view1Ctrl = $controller('View1Ctrl');
-      expect(view1Ctrl).toBeDefined();
-    }));
-
-  });
+        it('should ....', inject(function ($controller, $rootScope) {
+            var $scope = $rootScope.$new();
+            var ZenService = $rootScope.$new();
+            var Ctrl = $controller('ZenController', {$scope: $scope, ZenService: ZenService});
+            expect(Ctrl).toBeDefined();
+        }));
+    });
 });
