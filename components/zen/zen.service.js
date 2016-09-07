@@ -3,17 +3,56 @@
 
     angular
             .module('myApp.zen')
-            .factory('ZenService', ZenService);
-
-    ZenService.$inject = ['$http', '$q'];
+            .factory('ZenService', ZenService)
+            // ZEN_CONFIG=ZC
+            .constant("ZC", {
+                // pfad wo sich die Dateien befinden
+                "PATH_WORDS": "components/zen/words/",
+                "PART": {
+                    "SUBJECTIVE": 1,
+                    "OBJ": 2,
+                    "VERB": 3,
+                    "ARTICLE": 4,
+                    "PREPOSITION": 5,
+                    "CONJ": 6,
+                    "END": 99,
+                    "NONE": 0
+                },
+                "TYPE": [
+                    'adjective',
+                    'article',
+                    'conjs',
+                    /**
+                     * 98.7% of German nouns have a single gender.
+                     * Just under 1.3% can be used with two genders, and .02% can be used with all three genders.
+                     * Less than 0.1% of nouns have no gender at all (e.g. AIDS, Allerheiligen (a holiday)).
+                     * 
+                     * Of the nouns with a unique gender, 46% are feminine, 34% masculine, and 20% neuter.
+                     * So, if in doubt about the gender of a noun, guess "die" :)
+                     */
+                    'nouns',
+                    /**
+                     * Präpositionen sind kleine Wörter (an, in, zu),
+                     * die normalerweise vor einem Nomen stehen (manchmal auch vor einem Verb im Gerundium).
+                     */
+                    'preposition',
+                    'subjective',
+                    'verbs'
+                ]
+            });
+    ZenService.$inject = ['$http', '$q', 'ZC'];
 
     /**
      *
      * @returns {Object}
      * @constructor
      */
-    function ZenService($http, $q, $scope) {
-        var pathWords = 'components/zen/words/';
+    function ZenService($http, $q, ZC) {
+        /*
+         * hier werden alle woerter abgelegt.
+         *
+         * @type Array
+         */
         var words = [];
 
 //        var tenses = {
@@ -68,21 +107,8 @@
          */
         function getWords() {
             var promises = [];
-            var types = [
-                'adjective',
-                'article',
-                'conjs',
-                'nouns',
-                /**
-                 * Präpositionen sind kleine Wörter (an, in, zu),
-                 * die normalerweise vor einem Nomen stehen (manchmal auch vor einem Verb im Gerundium).
-                 */
-                'preposition', 
-                'subjective',
-                'verbs'
-            ];
 
-            angular.forEach(types, function (type) {
+            angular.forEach(ZC.TYPE, function (type) {
                 var promise = ftowl(type).then(function (response) {
                     var name = response.name;
                     words[name] = response.data;
@@ -105,7 +131,7 @@
             if (word.slice(0, 1) == '>') {
                 return word.slice(1);
             }
-            if (part == 'ARTICLE') {
+            if (part == ZC.PART.ARTICLE) {
                 // TODO zB Frau"en"
             }
             return ' ' + word;
@@ -118,7 +144,7 @@
          */
         function getPhrase(limit) {
             var ret = [];
-            var part = "ARTICLE"; // Das erste Wort startet mit einem Artikel
+            var part = ZC.PART.ARTICLE; // Das erste Wort startet mit einem Artikel
             var phrase = "";
             var nextWord, lastWord;
             var ccount = 0; // counts conjunctions
@@ -126,7 +152,7 @@
 
             var lim = 0;
             while (true) {
-                if (part == "CONJ") {
+                if (part == ZC.PART.CONJ) {
                     ccount++;
                     if (ccount == limit) {
                         return formatPhrase(phrase)
@@ -142,7 +168,7 @@
                     subj = ret[1];
                 }
 
-                if (part == "END") {
+                if (part == ZC.PART.END) {
                     //# fix 'a' vs 'an'
                     return formatPhrase(phrase);
                 }
@@ -168,7 +194,7 @@
          * @returns promise
          */
         function ftowl(filename) {
-            return $http.get(pathWords + filename + '.txt')
+            return $http.get(ZC.PATH_WORDS + filename + '.txt')
                     .then(function (result) {
                         return {'name': filename, 'data': result.data.trim().split('\n')};
                     }, function (error) {
@@ -180,7 +206,7 @@
          * Random word in array
          * 
          * @param array words
-         * @returns {zen_service_L1.ZenService.choice.a}
+         * @returns string
          */
         function choice(words) {
             var key = Math.floor(Math.random() * words.length);
@@ -190,19 +216,19 @@
         /**
          * find the next Word by random
          * 
-         * @param {type} part
-         * @returns {zen_service_L1.ZenService.choice.a}
+         * @param string part
+         * @returns string
          */
         function getRandomWord(part) {
             var data = {
-                "SUBJECTIVE": words.nouns,
-                "OBJ": words.nouns,
-                "ADJECTIVE": words.adjective,
-                "VERB": words.verbs,
-                "ARTICLE": words.article,
-                "PREPOSITION": words.preposition,
-                "CONJ": words.conjs,
-                "END": [""],
+                [ZC.PART.SUBJECTIVE]: words.nouns,
+                [ZC.PART.OBJ]: words.nouns,
+                [ZC.PART.ADJECTIVE]: words.adjective,
+                [ZC.PART.VERB]: words.verbs,
+                [ZC.PART.ARTICLE]: words.article,
+                [ZC.PART.PREPOSITION]: words.preposition,
+                [ZC.PART.CONJ]: words.conjs,
+                [ZC.PART.END]: [""]
             };
             return choice(data[part]);
         }
@@ -215,39 +241,52 @@
          * @returns {Array}
          */
         function getNextPart(part, subj) {
-            //# markov thing to map parts of speech together
-            // Was soll als nächstes folgen?!
-            // Die Summe der Gewichtungen muss zusammen 1 ergeben.
+            // PARTS
+            var p = ZC.PART;
+            
+            /**
+             * # markov thing to map parts of speech together
+             * 
+             * Was soll als nächstes folgen?!
+             * Die Summe der Gewichtungen muss zusammen 1 ergeben.
+             * 
+             * @type Array
+             */
             var l = {
-                "SUBJECTIVE": [["VERB", 1.0]],
-                "OBJ": [
-                    ["PREPOSITION", 0.3],
-                    ["CONJ", 0.3],
-                    ["END", 0.1]
+                [p.SUBJECTIVE]: [
+                    [p.VERB, 1.0]
                 ],
-                "ADJECTIVE": [
-                    ["ADJECTIVE", 0.3],
-                    ["SUBJECTIVE", 0.7 * subj],
-                    ["OBJ", 0.7 * !subj]
+                [p.OBJ]: [
+                    [p.PREPOSITION, 0.3],
+                    [p.CONJ, 0.3],
+                    [p.END, 0.1]
                 ],
-                "VERB": [
-                    ["PREPOSITION", 0.5],
-                    ["ARTICLE", 0.5]
+                [p.ADJECTIVE]: [
+                    [p.ADJECTIVE, 0.3],
+                    [p.SUBJECTIVE, 0.7 * subj],
+                    [p.OBJ, 0.7 * !subj]
                 ],
-                "ARTICLE": [
-                    ["ADJECTIVE", 0.6],
-                    ["SUBJECTIVE", 0.4 * subj],
-                    ["OBJ", 0.4 * !subj]
+                [p.VERB]: [
+                    [p.PREPOSITION, 0.5],
+                    [p.ARTICLE, 0.5]
                 ],
-                "PREPOSITION": [["ARTICLE", 1.0]],
-                "CONJ": [["ARTICLE", 1.0]],
+                [p.ARTICLE]: [
+                    [p.ADJECTIVE, 0.6],
+                    [p.SUBJECTIVE, 0.4 * subj],
+                    [p.OBJ, 0.4 * !subj]
+                ],
+                [p.PREPOSITION]: [
+                    [p.ARTICLE, 1.0]
+                ],
+                [p.CONJ]: [
+                    [p.ARTICLE, 1.0]
+                ],
             }[part];
 
             // Der Wert darf nie direkt 1 sein!
             var c = (Math.random() * (1 - 0.2) + 0.1).toFixed(1);
 //            var c = 0.13;
-            console.log(c);
-            var e = [["None", 1.0]];
+            var e = [[p.NONE, 1.0]];
 
             while (c > 0.0) {
                 if (l.length < 1) {
@@ -257,7 +296,7 @@
                 c -= e[1];
             }
 
-            if (e[0] == "VERB" || e[0] == "CONJ") {
+            if (e[0] == ZC.PART.VERB || e[0] == ZC.PART.CONJ) {
                 subj = !subj;
             }
 
@@ -275,4 +314,5 @@
         }
     }
 
-})(window.angular);
+}
+)(window.angular);
