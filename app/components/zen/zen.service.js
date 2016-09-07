@@ -169,7 +169,6 @@
                 }
 
                 if (part == ZC.PART.END) {
-                    //# fix 'a' vs 'an'
                     return formatPhrase(phrase);
                 }
 
