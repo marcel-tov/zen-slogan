@@ -1,10 +1,10 @@
 button.reload {
-    font-size: 30px;
+    font-size: 36px;
 }
 .phrase {
     font-family: 'Playfair Display';
     margin-top: 20px;
-    font-size: 30px;
+    font-size: 36px;
 }
 .phrase:empty {
     display: none;
