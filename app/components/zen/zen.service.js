@@ -16,6 +16,7 @@
                     "ARTICLE": 4,
                     "PREPOSITION": 5,
                     "CONJ": 6,
+                    "ADJECTIVE": 7,
                     "END": 99,
                     "NONE": 0
                 },
@@ -114,35 +115,41 @@
          * @private
          */
         function getWords() {
-            var promises = [];
-
-            angular.forEach(ZC.TYPE, function (type) {
-                var promise = ftowl(type).then(function (response) {
-                    var name = response.name;
-                    words[name] = response.data;
-                });
-                promises.push(promise);
-            });
-
-            return $q.all(promises);
+            return $http.get(ZC.PATH_WORDS + 'words.json')
+                    .then(function (result) {
+                        words = result.data;
+                        return words;
+                    }, function (error) {
+                        return {'error': error}
+                    });
         }
 
         /**
          * 
-         * @param string word
-         * @param string lastWord
+         * @param object word
+         * @param object lastWord
          * @param string part
+         * @param string lastPart
          * @returns string
          */
-        function toWord(word, lastWord, part) {
-            // wenn ein > dann folgt ein Komma!
-            if (word.slice(0, 1) == '>') {
-                return word.slice(1);
+        function toWord(word, lastWord, part, lastPart) {
+            var result = '';
+            // text vorangestellt
+            if (typeof word.prepend !== 'undefined') {
+                result += word.prepend;
+            } else {
+                result += ' ';
             }
-            if (part == ZC.PART.ARTICLE) {
+            // word selbst
+            if (typeof word.word !== 'undefined') {
+                result += word.word;
+            }
                 // TODO zB Frau"en"
-            }
-            return ' ' + word;
+//            if (part == ZC.PART.ARTICLE) {
+//            }
+            
+//            return ' ' + result + '('+ part +')';
+            return result;
         }
 
         /**
@@ -153,6 +160,7 @@
         function getPhrase(limit) {
             var ret = [];
             var part = ZC.PART.ARTICLE; // Das erste Wort startet mit einem Artikel
+            var lastPart;
             var phrase = "";
             var nextWord, lastWord;
             var ccount = 0; // counts conjunctions
@@ -167,9 +175,10 @@
                     }
                 }
                 
-                nextWord = getRandomWord(part);
-                phrase += toWord(nextWord, lastWord, part);
+                nextWord = getRandomWord(part, lastWord);
+                phrase += toWord(nextWord, lastWord, part, lastPart);
                 lastWord = nextWord;
+                lastPart = part;
                 var ret = getNextPart(part, subj, countWords);
                 if (ret) {
                     part = ret[0];
@@ -196,26 +205,31 @@
         }
 
         /**
-         * 
-         * @param string filename
-         * @returns promise
-         */
-        function ftowl(filename) {
-            return $http.get(ZC.PATH_WORDS + filename + '.txt')
-                    .then(function (result) {
-                        return {'name': filename, 'data': result.data.trim().split('\n')};
-                    }, function (error) {
-                        return {'error': error}
-                    });
-        }
-
-        /**
          * Random word in array
          * 
          * @param array words
-         * @returns string
+         * @param object lastWord
+         * @returns object
          */
-        function choice(words) {
+        function choice(words, lastWord) {
+            if (typeof lastWord !== 'undefined') {
+                // Wenn das vorhergehende Wort ein Geschlecht hat und das nächste auch!
+                // Muss das nächste auch eines haben.
+                if (typeof lastWord.gender !== 'undefined') {
+                    var newWords = [];
+                    // alle woerter eines bestimmten geschlechts raussuchen.
+                    words.forEach(function(element, index, array){
+                        if (typeof element.gender !== 'undefined' && element.gender == lastWord.gender) {
+                            newWords.push(element);
+                        }
+                    });
+                    // zuweisen
+                    if (newWords.length > 0) {
+                        words = newWords;
+                    }
+                }
+            }
+            
             var key = Math.floor(Math.random() * words.length);
             return words[key]; // return random
         }
@@ -224,9 +238,10 @@
          * find the next Word by random
          * 
          * @param string part
-         * @returns string
+         * @param object lastWord
+         * @returns object
          */
-        function getRandomWord(part) {
+        function getRandomWord(part, lastWord) {
             var data = {
                 [ZC.PART.SUBJECTIVE]: words.nouns,
                 [ZC.PART.OBJ]: words.nouns,
@@ -237,7 +252,7 @@
                 [ZC.PART.CONJ]: words.conjs,
                 [ZC.PART.END]: [""]
             };
-            return choice(data[part]);
+            return choice(data[part], lastWord);
         }
 
         /**
@@ -275,8 +290,9 @@
                     [p.OBJ, 0.7 * !subj]
                 ],
                 [p.VERB]: [
-                    [p.PREPOSITION, 0.5],
-                    [p.ARTICLE, 0.5]
+                    [p.PREPOSITION, 0.4],
+                    [p.ARTICLE, 0.4],
+                    [p.END, 0.1]
                 ],
                 [p.ARTICLE]: [
                     [p.ADJECTIVE, 0.6],
@@ -297,7 +313,7 @@
             var e = [[p.NONE, 1.0]];
             
             // Satzlaenge begrenzen
-            if (countWords > ZC.END_PHRASE_MAX_WORDS && part == p.OBJ) {
+            if (countWords > ZC.END_PHRASE_MAX_WORDS && (part == p.OBJ || part == p.VERB)) {
                 e = l[2];
                 c -= e[1];
             } else {
@@ -309,12 +325,9 @@
                     c -= e[1];
                 }
             }
-            
-
             if (e[0] == ZC.PART.VERB || e[0] == ZC.PART.CONJ) {
                 subj = !subj;
             }
-
             return [e[0], subj];
         }
 

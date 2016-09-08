@@ -1,0 +1,74 @@
+{
+    "adjective": [
+        {"word": "große", "gender": "m"},
+        {"word": "lange", "gender": "m"},
+        
+        {"word": "ganze", "gender": "f"},
+        
+        {"word": "ganze", "gender": "n"},
+        {"word": "gute", "gender": "n"},
+        {"word": "lange", "gender": "n"},
+        {"word": "kleine", "gender": "n"},
+        {"word": "gleiche", "gender": "n"}
+    ],
+    "article": [
+        {"word": "der", "gender": "m"},
+        {"word": "die", "gender": "f"},
+        {"word": "das", "gender": "n"},
+        {"word": "ein", "gender": "n"}
+    ],
+    "conjs": [
+        {"word": "dann", "prepend": ", "},
+        {"word": "denn", "prepend": ", "},
+        {"word": "und"},
+        {"word": "aber"},
+        {"word": "oder"},
+        {"word": "als"}
+    ],
+    "nouns": [
+        {"word": "Buddha", "gender": "m"},
+        {"word": "Fluss", "gender": "m"},
+        {"word": "Körper", "gender": "m"},
+        {"word": "Mensch", "gender": "m"},
+        {"word": "Tee", "gender": "m"},
+        {"word": "Weg", "gender": "m"},
+        {"word": "Winter", "gender": "m"},
+        
+        {"word": "Aufgabe", "gender": "f"},
+        {"word": "Berge", "gender": "f"},
+        {"word": "Demut", "gender": "f"},
+        {"word": "Erde", "gender": "f"},
+        {"word": "Harmonie", "gender": "f"},
+        {"word": "Liebe", "gender": "f"},
+        {"word": "Natur", "gender": "f"},
+        {"word": "Sonne", "gender": "f"},
+        
+        {"word": "Auge", "gender": "n"},
+        {"word": "Herz", "gender": "n"},
+        {"word": "Leben", "gender": "n"},
+        {"word": "Land", "gender": "n"},
+        {"word": "Meer", "gender": "n"},
+        {"word": "Wort", "gender": "n"}
+    ],
+    "preposition": [
+        {"word": "in"},
+        {"word": "zu"},
+        {"word": "von"},
+        {"word": "mit"}
+    ],
+    "subjective": [
+        {"word": "Leben"},
+        {"word": "Warheit"},
+        {"word": "Quelle"},
+        {"word": "Licht"},
+        {"word": "Erleuchtung"}
+    ],
+    "verbs": [
+        {"word": "sieht"},
+        {"word": "sein"},
+        {"word": "bleib"},
+        {"word": "glaubt"},
+        {"word": "denkt"},
+        {"word": "geht"}
+    ]    
+}
