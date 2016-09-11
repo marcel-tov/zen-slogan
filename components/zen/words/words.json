@@ -7,9 +7,11 @@
         
         {"word": "ganze", "gender": "n"},
         {"word": "gute", "gender": "n"},
-        {"word": "lange", "gender": "n"},
+        {"word": "gleiche", "gender": "n"},
+        {"word": "glückliche", "gender": "n"},
         {"word": "kleine", "gender": "n"},
-        {"word": "gleiche", "gender": "n"}
+        {"word": "lange", "gender": "n"},
+        {"word": "richtige", "gender": "n"}
     ],
     "article": [
         {"word": "der", "gender": "m"},
@@ -28,6 +30,7 @@
     "nouns": [
         {"word": "Buddha", "gender": "m"},
         {"word": "Fluss", "gender": "m"},
+        {"word": "Geist", "gender": "m"},
         {"word": "Körper", "gender": "m"},
         {"word": "Mensch", "gender": "m"},
         {"word": "Tee", "gender": "m"},
@@ -36,39 +39,70 @@
         
         {"word": "Aufgabe", "gender": "f"},
         {"word": "Berge", "gender": "f"},
+        {"word": "Blume", "gender": "f"},
         {"word": "Demut", "gender": "f"},
         {"word": "Erde", "gender": "f"},
         {"word": "Harmonie", "gender": "f"},
         {"word": "Liebe", "gender": "f"},
         {"word": "Natur", "gender": "f"},
         {"word": "Sonne", "gender": "f"},
+        {"word": "Stimme", "gender": "f"},
+        {"word": "Weisheit", "gender": "f"},
+        {"word": "Wurzel", "gender": "f"},
         
         {"word": "Auge", "gender": "n"},
+        {"word": "Bewusstsein", "gender": "n"},
         {"word": "Herz", "gender": "n"},
         {"word": "Leben", "gender": "n"},
         {"word": "Land", "gender": "n"},
+        {"word": "Lächeln", "gender": "n"},
         {"word": "Meer", "gender": "n"},
         {"word": "Wort", "gender": "n"}
     ],
     "preposition": [
+        {"word": "aus"},
+        {"word": "an"},
+        {"word": "bis"},
+        {"word": "durch"},
+        {"word": "gegenüber"},
+        {"word": "gegenüber"},
         {"word": "in"},
-        {"word": "zu"},
+        {"word": "mit"},
+        {"word": "nach"},
+        {"word": "nach"},
+        {"word": "während"},
+        {"word": "seit"},
+        {"word": "ohne"},
+        {"word": "um"},
+        {"word": "über"},
+        {"word": "vor"},
         {"word": "von"},
-        {"word": "mit"}
+        {"word": "wegen"},
+        {"word": "zu"},
+        {"word": "zwischen"}
     ],
     "subjective": [
+        {"word": "Erde"},
+        {"word": "Erleuchtung"},
+        {"word": "Freude"},
+        {"word": "Freundschaft"},
         {"word": "Leben"},
-        {"word": "Warheit"},
-        {"word": "Quelle"},
         {"word": "Licht"},
-        {"word": "Erleuchtung"}
+        {"word": "Quelle"},
+        {"word": "Schlüssel"},
+        {"word": "Warheit"},
+        {"word": "Wasser"},
+        {"word": "Zeitspanne"}
     ],
     "verbs": [
+        {"word": "bleib"},
+        {"word": "denkt"},
+        {"word": "glaubt"},
+        {"word": "geht"},
+        {"word": "habe"},
+        {"word": "werde"},
         {"word": "sieht"},
         {"word": "sein"},
-        {"word": "bleib"},
-        {"word": "glaubt"},
-        {"word": "denkt"},
-        {"word": "geht"}
+        {"word": "sagen"}
     ]    
 }
