@@ -15,6 +15,7 @@
             <button class="btn btn-lg btn-default reload"
                     data-ng-init="loadPhrase()"
                     data-ng-click="loadPhrase()"
+                    data-toggle="tooltip"
                     title="Spruch generieren">
                 <i class="fa fa-circle-o"></i>
             </button>
@@ -22,3 +23,8 @@
         </div>
     </div>
 </div>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
