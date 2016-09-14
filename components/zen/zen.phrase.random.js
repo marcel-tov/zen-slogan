@@ -44,87 +44,6 @@
 //                return verb;
 //            },
 //        }
-                    
-//
-//                    /**
-//                     * 
-//                     * @param object word
-//                     * @param object lastWord
-//                     * @param string part
-//                     * @param string lastPart
-//                     * @returns string
-//                     */
-//                    var toWord = function(word, lastWord, part, lastPart) {
-//                        var result = '';
-//                        // text vorangestellt
-//                        if (typeof word.prepend !== 'undefined') {
-//                            result += word.prepend;
-//                        } else {
-//                            result += ' ';
-//                        }
-//                        // word selbst
-//                        if (typeof word.word !== 'undefined') {
-//                            result += word.word;
-//                        }
-//                            // TODO zB Frau"en"
-//            //            if (part == ZC.PART.ARTICLE) {
-//            //            }
-//
-//            //            return ' ' + result + '('+ part +')';
-//                        return result;
-//                    }                    
-//                    
-//                    /**
-//                     * Random word in array
-//                     * 
-//                     * @param array words
-//                     * @param object lastWord
-//                     * @returns object
-//                     */
-//                    var choice = function(words, lastWord) {
-//                        if (typeof lastWord !== 'undefined') {
-//                            // Wenn das vorhergehende Wort ein Geschlecht hat und das nächste auch!
-//                            // Muss das nächste auch eines haben.
-//                            if (typeof lastWord.gender !== 'undefined') {
-//                                var newWords = [];
-//                                // alle woerter eines bestimmten geschlechts raussuchen.
-//                                words.forEach(function(element, index, array){
-//                                    if (typeof element.gender !== 'undefined' && element.gender == lastWord.gender) {
-//                                        newWords.push(element);
-//                                    }
-//                                });
-//                                // zuweisen
-//                                if (newWords.length > 0) {
-//                                    words = newWords;
-//                                }
-//                            }
-//                        }
-//
-//                        var key = Math.floor(Math.random() * words.length);
-//                        return words[key]; // return random
-//                    }
-//                    
-//                    /**
-//                    * find the next Word by random
-//                    * 
-//                    * @param string part
-//                    * @param object lastWord
-//                    * @returns object
-//                    */
-//                   var getRandomWord = function(part, lastWord) {
-//                       var data = {
-//                           [ZC.PART.SUBJECTIVE]: words.nouns,
-//                           [ZC.PART.OBJ]: words.nouns,
-//                           [ZC.PART.ADJECTIVE]: words.adjective,
-//                           [ZC.PART.VERB]: words.verbs,
-//                           [ZC.PART.ARTICLE]: words.article,
-//                           [ZC.PART.PREPOSITION]: words.preposition,
-//                           [ZC.PART.CONJ]: words.conjs,
-//                           [ZC.PART.END]: [""]
-//                       };
-//                       return choice(data[part], lastWord);
-//                   }
-                   
 
                     /**
                      * Ermittelt das nächste Wort welches auf das vorherige folgen soll
@@ -230,6 +149,7 @@
                          * @returns {undefined}
                          */
                         getPhrase: function (response, limit = 10) {
+                            console.info('phrase by random');
                             words = response;
 
                             var ret = [];

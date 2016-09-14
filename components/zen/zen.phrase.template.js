@@ -16,7 +16,7 @@
                      */
                     var templates = [
                         'ARTICLE OBJ ARTICLE VERB SUBJECTIVE ADJECTIVE',
-                        'VERB SUBJECTIVE ARTICLE CONJ OBJ ADJECTIVE ARTICLE VERB SUBJECTIVE ADJECTIVE',
+                        'VERB ARTICLE SUBJECTIVE ARTICLE CONJ OBJ ADJECTIVE ARTICLE VERB SUBJECTIVE ADJECTIVE',
                         'ARTICLE OBJ ADJECTIVE ARTICLE PREPOSITION OBJ ARTICLE VERB SUBJECTIVE ADJECTIVE'
                     ];
                     
@@ -32,10 +32,11 @@
                          * @returns {undefined}
                          */
                         getPhrase: function (response, limit = 10) {
+                            console.info('phrase by template');
                             words = response;
                             var template = getRandomTemplate();
                             
-                            var parts = template.split(' ');
+                            var parts = template.split(' ').reverse();
                             if (parts.length < 1) {
                                 return '';
                             }
