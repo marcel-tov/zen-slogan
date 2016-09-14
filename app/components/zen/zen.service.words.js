@@ -48,7 +48,7 @@
                                 return $q.when(data.words);
                             }
                             
-                            return $http.get(ZC.PATH_WORDS + 'words.json')
+                            return $http.get(ZC.PATH_WORDS + 'words_de.json')
                                     .then(function (result) {
                                         data.words = result.data;
                                         return data.words;

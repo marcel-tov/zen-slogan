@@ -57,11 +57,8 @@
                      */
                     $scope.loadPhrase = function () {
                         ZenServiceWords.getWords().then(function (response) {
-//                            console.info('phrase by random');
-                            $scope.phrase = ZenPhraseRandom.getPhrase(response, 8);
-                            
-//                            console.info('phrase by template');
-//                            $scope.phrase = ZenServiceTemplate.getPhrase(response);
+//                            $scope.phrase = ZenPhraseRandom.getPhrase(response, 8);
+                            $scope.phrase = ZenServiceTemplate.getPhrase(response);
                             console.log($scope.phrase);
                         });
                     };
