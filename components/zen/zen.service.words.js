@@ -20,14 +20,14 @@
                      * @returns object
                      */
                     var choice = function(words, lastWord) {
-                        if (typeof lastWord !== 'undefined') {
+                        if (angular.isDefined(lastWord)) {
                             // Wenn das vorhergehende Wort ein Geschlecht hat und das nächste auch!
                             // Muss das nächste auch eines haben.
-                            if (typeof lastWord.gender !== 'undefined') {
+                            if (angular.isDefined(lastWord.gender)) {
                                 var newWords = [];
                                 // alle woerter eines bestimmten geschlechts raussuchen.
                                 words.forEach(function(element, index, array){
-                                    if (typeof element.gender !== 'undefined' && element.gender == lastWord.gender) {
+                                    if (angular.isDefined(element.gender) && element.gender == lastWord.gender) {
                                         newWords.push(element);
                                     }
                                 });
@@ -44,7 +44,7 @@
 
                     return {
                         getWords: function () {
-                            if (typeof data.words === 'object') {
+                            if (angular.isObject(data.words)) {
                                 return $q.when(data.words);
                             }
                             
@@ -87,18 +87,24 @@
                         toWord: function(word, lastWord, part, lastPart) {
                             var result = '';
                             // text vorangestellt
-                            if (typeof word.prepend !== 'undefined') {
+                            if (angular.isDefined(word.prepend)) {
                                 result += word.prepend;
                             } else {
                                 result += ' ';
                             }
                             // word selbst
-                            if (typeof word.word !== 'undefined') {
+                            if (angular.isDefined(word.word)) {
                                 result += word.word;
                             }
-                                // TODO zB Frau"en"
-                //            if (part == ZC.PART.ARTICLE) {
-                //            }
+
+                            // Check Plural
+                            if (angular.isDefined(lastWord) && angular.isDefined(lastWord.nextPlural)) {
+                                if (angular.isDefined(word)) {
+                                    if (word.plural === true) {
+                                        result += 's';
+                                    }
+                                }
+                            }
 
 //                            return ' ' + result + '('+ part +')';
                             return result;
