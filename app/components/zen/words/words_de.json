@@ -1,23 +1,23 @@
 {
     "adjective": [
-        {"word": "große", "gender": "m"},
-        {"word": "lange", "gender": "m"},
+        {"word": "große", "gender": "m", "plural": true},
+        {"word": "lange", "gender": "m", "plural": true},
         
-        {"word": "ganze", "gender": "f"},
+        {"word": "ganze", "gender": "f", "plural": true},
         
-        {"word": "ganze", "gender": "n"},
-        {"word": "gute", "gender": "n"},
-        {"word": "gleiche", "gender": "n"},
-        {"word": "glückliche", "gender": "n"},
-        {"word": "kleine", "gender": "n"},
-        {"word": "lange", "gender": "n"},
-        {"word": "richtige", "gender": "n"}
+        {"word": "ganze", "gender": "n", "plural": true},
+        {"word": "gute", "gender": "n", "plural": true},
+        {"word": "gleiche", "gender": "n", "plural": true},
+        {"word": "glückliche", "gender": "n", "plural": true},
+        {"word": "kleine", "gender": "n", "plural": true},
+        {"word": "lange", "gender": "n", "plural": true},
+        {"word": "richtige", "gender": "n", "plural": true}
     ],
     "article": [
         {"word": "der", "gender": "m"},
         {"word": "die", "gender": "f"},
         {"word": "das", "gender": "n"},
-        {"word": "ein", "gender": "n"}
+        {"word": "ein", "gender": "n", "nextPlural": true}
     ],
     "conjs": [
         {"word": "dann", "prepend": ", "},
